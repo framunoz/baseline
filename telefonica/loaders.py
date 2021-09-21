@@ -15,10 +15,6 @@ class XLSXLoader(ABC):
         self.df = None
 
 
-class MatrizDistanciaCTO(XLSXLoader):
-    pass
-
-
 class DataBase(XLSXLoader, ABC):
     # TODO: COMPLETAR!
 
@@ -34,8 +30,8 @@ class DataBase(XLSXLoader, ABC):
         return 0
 
     @property
-    def args(self) -> zip[tuple[int, float, float]]:
-        return zip(range(len(self.lat)), self.lat, self.lon)
+    def args(self):
+        return zip(list(range(len(self.lat))), self.lat, self.lon)
 
 
 class FODB(DataBase):
@@ -47,4 +43,22 @@ class RMDB(DataBase):
 
 
 class ClienteDB(DataBase):
+    pass
+
+
+class SingletonMeta(type):
+    """
+    Para ocupar el patrón Singleton
+    """
+
+    _instances = {}
+
+    def __call__(cls, *args, **kwargs):
+        if cls not in cls._instances:
+            instance = super().__call__(*args, **kwargs)
+            cls._instances[cls] = instance
+        return cls._instances[cls]
+
+
+class MatrizDistanciaCTO(metaclass=SingletonMeta):
     pass
