@@ -1,4 +1,3 @@
-import abc
 import os
 from abc import ABC
 
@@ -8,10 +7,8 @@ class XLSXLoader(ABC):
     Utilizado para cargar los data frames.
     """
 
-    MAIN_PATH = os.path.join("./")
-
     def __init__(self, path):
-        self.path = os.path.join(self.MAIN_PATH, path)
+        self.path = os.path.join(path)
         self.df = None
 
 
