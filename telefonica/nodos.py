@@ -17,6 +17,12 @@ class Nodo(ABC):
                 + "lon=" + str(self.lon)
                 + ")")
 
+    def dist_1(self, other) -> float:
+        return 0.
+
+    def dist_2(self, other) -> float:
+        return 0.
+
 
 class Oferta(Nodo, ABC):
     def __init__(self, id, lat, lon, oferta):
