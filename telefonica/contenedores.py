@@ -1,8 +1,8 @@
 import abc
 from abc import ABC
-from typing import Tuple, Any
+from typing import Any
 
-from telefonica.loaders import DataBase, FODB, RMDB, ClienteDB
+from telefonica.loaders import FODB, RMDB, ClienteDB
 from telefonica.nodos import FO, RM, Oferta, Cliente
 
 
@@ -14,6 +14,10 @@ class Contenedor(ABC):
 
     def __len__(self):
         return len(self.nodos)
+
+    @abc.abstractmethod
+    def __getitem__(self, item):
+        pass
 
 
 class NodosOferta(Contenedor):
@@ -31,6 +35,10 @@ class NodosOferta(Contenedor):
         self.indice = set(range_oferta)
         self.indice_fo = set(range_oferta[:len_fo])
         self.indice_rm = set(range_oferta[len_fo:])
+        # TODO: Añadir el nodo auxiliar!
+
+    def __getitem__(self, item) -> Oferta:
+        return self.nodos.__getitem__(item)
 
 
 class NodosDemanda(Contenedor):
@@ -40,3 +48,6 @@ class NodosDemanda(Contenedor):
         self.nodos: list[Cliente] = [Cliente(*args) for args in self.db.args]
         self.total = len(self)
         self.indice = set(range(len(self)))
+
+    def __getitem__(self, item) -> Cliente:
+        return self.nodos.__getitem__(item)
