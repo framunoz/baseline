@@ -33,7 +33,6 @@ class NodosOferta(Contenedor):
         self.indice = set(range_oferta)
         self.indice_fo = set(range_oferta[:len_fo])
         self.indice_rm = set(range_oferta[len_fo:-1])
-        # TODO: Añadir el nodo auxiliar!
 
     def __getitem__(self, item) -> Oferta:
         return self.nodos.__getitem__(item)

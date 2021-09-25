@@ -1,6 +1,7 @@
 import os
 from abc import ABC
 
+import numpy as np
 import pandas as pd
 
 
@@ -69,4 +70,19 @@ class SingletonMeta(type):
 
 
 class MatrizDistanciaCTO(metaclass=SingletonMeta):
-    pass
+    """
+    Representa a una matriz de distancia
+    """
+
+    def __init__(self, n=None, m=None):
+
+        if n is not None and m is not None:
+            self.matriz: np.ndarray = np.zeros((n, m))
+        else:
+            self.matriz: np.ndarray = np.array([])
+
+    def __getitem__(self, item):
+        return self.matriz.__getitem__(item)
+
+    def __setitem__(self, key, value):
+        self.matriz.__setitem__(key, value)

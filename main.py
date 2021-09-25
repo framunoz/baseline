@@ -14,9 +14,8 @@ array = np.zeros((4, 6))
 array[0] = 1
 print(array)
 
-i1 = MatrizDistanciaCTO()
-i1.a = 0
+i1 = MatrizDistanciaCTO(3, 5)
+i1[2, 3] = 5
 i2 = MatrizDistanciaCTO()
-i2.a = 10
 
-print(i1.a)
+print(i1.matriz)
