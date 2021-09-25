@@ -1,7 +1,7 @@
 import numpy as np
 
-from telefonica.loaders import MatrizDistanciaCTO
-from telefonica.nodos import FO
+from despliegue.loaders import MatrizDistanciaCTO
+from despliegue.nodos import FO
 
 print(FO(3, 3.2, 123.3, 454))
 

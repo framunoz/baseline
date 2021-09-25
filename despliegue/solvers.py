@@ -1,7 +1,7 @@
 import numpy as np
 import pulp
 
-from telefonica.contenedores import NodosOferta, NodosDemanda
+from despliegue.contenedores import NodosOferta, NodosDemanda
 
 
 class Solver:
@@ -26,7 +26,7 @@ class Solver:
             self.matriz_costos[i] = self.b
 
         # Definición del modelo
-        self.modelo = pulp.LpProblem("telefonica", pulp.LpMaximize)
+        self.modelo = pulp.LpProblem("despliegue", pulp.LpMaximize)
         self.x = pulp.LpVariable.dicts(
             "x",
             (ind for ind in zip(self.oferta.indice, self.demanda.indice)),

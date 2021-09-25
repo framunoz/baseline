@@ -1,8 +1,8 @@
 import abc
 from abc import ABC
 
-from telefonica.loaders import OfertaDB, ClienteDB
-from telefonica.nodos import FO, RM, Oferta, Cliente
+from despliegue.loaders import OfertaDB, ClienteDB
+from despliegue.nodos import FO, RM, Oferta, Cliente, Sumidero
 
 
 class Contenedor(ABC):

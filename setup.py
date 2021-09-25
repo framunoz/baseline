@@ -10,10 +10,10 @@ with pathlib.Path('requirements.txt').open() as requirements_txt:
     ]
 
 setup(
-    name="telefonica",
+    name="despliegue",
     packages=find_packages(),
     version="0.1.0",
-    description="Libreria para la baseline de telefonica",
+    description="Libreria para la baseline de despliegue",
     author="F. Muñoz",
     license="MIT",
     install_requires=install_requires,

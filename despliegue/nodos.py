@@ -88,6 +88,3 @@ class Sumidero(Oferta):
 
     def dist_2(self, other) -> float:
         pass
-
-    def __init__(self):
-        super().__init__(0, 0., 0., 0.)
