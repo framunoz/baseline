@@ -20,9 +20,9 @@ class Solver:
         # Matriz de Costos
         self.matriz_costos = np.zeros((len(self.oferta), len(self.demanda)))
         for i in self.oferta.indice_fo:
-            self.matriz_costos[i] = a
+            self.matriz_costos[i] = self.a
         for i in self.oferta.indice_rm:
-            self.matriz_costos[i] = b
+            self.matriz_costos[i] = self.b
 
         # Definición del modelo
         self.modelo = pulp.LpProblem("telefonica", pulp.LpMaximize)
@@ -42,7 +42,7 @@ class Solver:
     def definir_restricciones(self):
         # Restricción de la Oferta
         for i in self.oferta.indice:
-            self.modelo += pulp.lpSum([self.x[i, j] for j in self.demanda.indice]) <= self.oferta[i].oferta
+            self.modelo += pulp.lpSum([self.x[i, j] for j in self.demanda.indice]) <= self.oferta[i].vacancia
 
         # Restricción de la Demanda
         for j in self.demanda.indice:

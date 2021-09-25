@@ -25,9 +25,9 @@ class Nodo(ABC):
 
 
 class Oferta(Nodo, ABC):
-    def __init__(self, id, lat, lon, oferta):
+    def __init__(self, id, lat, lon, vacancia):
         Nodo.__init__(self, id, lat, lon)
-        self.oferta = oferta
+        self.vacancia = vacancia
 
 
 class FO(Oferta):

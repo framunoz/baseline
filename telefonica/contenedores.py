@@ -1,6 +1,5 @@
 import abc
 from abc import ABC
-from typing import Any
 
 from telefonica.loaders import FODB, RMDB, ClienteDB
 from telefonica.nodos import FO, RM, Oferta, Cliente
@@ -25,11 +24,10 @@ class NodosOferta(Contenedor):
         super().__init__()
         self.fo_db: FODB = FODB(path_fo)
         self.rm_db: RMDB = RMDB(path_rm)
-        args: tuple[Any, float, float]
         list_fo: list[Oferta] = [FO(*args) for args in self.fo_db.args]
         list_rm: list[Oferta] = [RM(*args) for args in self.rm_db.args]
         self.nodos: list[Oferta] = list_fo + list_rm
-        self.total = sum([of.oferta for of in self.nodos])
+        self.total = sum([of.vacancia for of in self.nodos])
         len_fo = len(list_fo)
         range_oferta = list(range(len(self)))
         self.indice = set(range_oferta)
