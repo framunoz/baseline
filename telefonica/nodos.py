@@ -1,12 +1,14 @@
+import abc
 from abc import ABC
 
 
 class Nodo(ABC):
     """
-    Representa un nodo. Puede ser una Fibra Óptica (FO), Red Móvil (RM), Clientes o Nodos Auxiliares
+    Representa un nodo. Puede ser una Fibra Óptica (FO), Red Móvil (RM), Clientes o Sumidero
     """
-    def __init__(self, id, lat, lon):
-        self.id = id
+
+    def __init__(self, identificador, lat, lon):
+        self.id = identificador
         self.lat = lat
         self.lon = lon
 
@@ -17,42 +19,72 @@ class Nodo(ABC):
                 + "lon=" + str(self.lon)
                 + ")")
 
+    @abc.abstractmethod
     def dist_1(self, other) -> float:
-        return 0.
+        pass
 
+    @abc.abstractmethod
     def dist_2(self, other) -> float:
-        return 0.
-
-
-class Oferta(Nodo, ABC):
-    def __init__(self, id, lat, lon, vacancia):
-        Nodo.__init__(self, id, lat, lon)
-        self.vacancia = vacancia
-
-
-class FO(Oferta):
-    """
-    Fibra Óptica
-    """
-    pass
-
-
-class RM(Oferta):
-    """
-    Red Móvil
-    """
-    pass
+        pass
 
 
 class Cliente(Nodo):
     """
     Cliente
     """
-    pass
+
+    def dist_1(self, other) -> float:
+        pass
+
+    def dist_2(self, other) -> float:
+        pass
 
 
-# TODO: Borrar en el futuro
-# class NodoAuxiliar(Nodo):
-#     """
-#     Nodo Auxiliar. Utilizado para la optimización.
-#     """
+class Oferta(Nodo, ABC):
+    def __init__(self, identificador, lat, lon, vacancia):
+        Nodo.__init__(self, identificador, lat, lon)
+        self.vacancia = vacancia
+
+    def __repr__(self):
+        return (super().__repr__()[:-1] + ", "
+                + "vacancia=" + str(self.vacancia)
+                + ")")
+
+
+class FO(Oferta):
+    """
+    Fibra Óptica
+    """
+
+    def dist_1(self, other) -> float:
+        pass
+
+    def dist_2(self, other) -> float:
+        pass
+
+
+class RM(Oferta):
+    """
+    Red Móvil
+    """
+
+    def dist_1(self, other) -> float:
+        pass
+
+    def dist_2(self, other) -> float:
+        pass
+
+
+class Sumidero(Oferta):
+    """
+    Sumidero. Nodo Auxiliar para la oferta.
+    """
+
+    def dist_1(self, other) -> float:
+        pass
+
+    def dist_2(self, other) -> float:
+        pass
+
+    def __init__(self):
+        super().__init__(0, 0., 0., 0.)
