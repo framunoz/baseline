@@ -80,6 +80,9 @@ class Sumidero(Oferta):
     Sumidero. Nodo Auxiliar para la oferta.
     """
 
+    def __init__(self):
+        super().__init__(0, 0., 0., 0)
+
     def dist_1(self, other) -> float:
         pass
 

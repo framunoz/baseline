@@ -26,13 +26,13 @@ class NodosOferta(Contenedor):
         self.rm_db: OfertaDB = OfertaDB(path_rm)
         list_fo: list[Oferta] = [FO(*args) for args in self.fo_db.args]
         list_rm: list[Oferta] = [RM(*args) for args in self.rm_db.args]
-        self.nodos: list[Oferta] = list_fo + list_rm
+        self.nodos: list[Oferta] = list_fo + list_rm + [Sumidero()]
         self.total = sum([of.vacancia for of in self.nodos])
         len_fo = len(list_fo)
         range_oferta = list(range(len(self)))
         self.indice = set(range_oferta)
         self.indice_fo = set(range_oferta[:len_fo])
-        self.indice_rm = set(range_oferta[len_fo:])
+        self.indice_rm = set(range_oferta[len_fo:-1])
         # TODO: Añadir el nodo auxiliar!
 
     def __getitem__(self, item) -> Oferta:

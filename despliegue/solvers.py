@@ -10,6 +10,7 @@ class Solver:
         # Nodos oferta y demanda
         self.oferta = oferta
         self.demanda = demanda
+        self.oferta[-1].vacancia = len(demanda)  # Seteamos la vacancia del sumidero
 
         # Constantes
         self.a = a
