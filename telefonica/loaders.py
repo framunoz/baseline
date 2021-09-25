@@ -1,46 +1,57 @@
 import os
 from abc import ABC
 
-
-class XLSXLoader(ABC):
-    """
-    Utilizado para cargar los data frames.
-    """
-
-    def __init__(self, path):
-        self.path = os.path.join(path)
-        self.df = None
+import pandas as pd
 
 
-class DataBase(XLSXLoader, ABC):
-    # TODO: COMPLETAR!
-
-    @property
-    def lat(self) -> list[float]:
-        return []
-
-    @property
-    def lon(self) -> list[float]:
-        return []
+class DataBase(ABC):
+    def __init__(self, path, col_names=None):
+        self.path: bytes = os.path.join(path)
+        self.col_names: list[str] = col_names
+        self.df: pd.DataFrame = pd.DataFrame()
 
     def __len__(self) -> int:
-        return 0
+        return len(self.df)
 
     @property
     def args(self):
-        return zip(list(range(len(self.lat))), self.lat, self.lon)
+        return self.df.values
 
 
-class FODB(DataBase):
-    pass
+class OfertaDB(DataBase):
 
+    def __init__(self, path, col_names=None):
+        """
+        Constructor.
 
-class RMDB(DataBase):
-    pass
+        :param path: El path del archivo .xlsx
+        :param col_names: Una lista con los nombres de las columnas en el orden
+            ["id", "latitud", "longitud", "vacancia"]. Si no se entrega se asume que el dataset contiene únicamente
+            estas columnas en el mismo orden.
+        """
+        super().__init__(path, col_names)
+        if col_names is not None:
+            self.df: pd.DataFrame = pd.read_excel(self.path, dtype=object)[self.col_names]
+        else:
+            self.df: pd.DataFrame = pd.read_excel(self.path, dtype=object)
+        self.df.columns = ["id", "lat", "lon", "vac"]
 
 
 class ClienteDB(DataBase):
-    pass
+    def __init__(self, path, col_names=None):
+        """
+        Constructor.
+
+        :param path: El path del archivo .xlsx
+        :param col_names: Una lista con los nombres de las columnas en el orden ["id", "latitud", "longitud"].
+            Si no se entrega se asume que el dataset contiene únicamente estas columnas en el mismo orden.
+        """
+        super().__init__(path, col_names)
+        if col_names is not None:
+            self.df: pd.DataFrame = pd.read_excel(self.path, dtype=object)[self.col_names]
+        else:
+            self.df: pd.DataFrame = pd.read_excel(self.path, dtype=object)
+        self.df.columns = ["id", "lat", "lon"]
 
 
 class SingletonMeta(type):

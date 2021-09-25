@@ -1,7 +1,7 @@
 import abc
 from abc import ABC
 
-from telefonica.loaders import FODB, RMDB, ClienteDB
+from telefonica.loaders import OfertaDB, ClienteDB
 from telefonica.nodos import FO, RM, Oferta, Cliente
 
 
@@ -22,8 +22,8 @@ class Contenedor(ABC):
 class NodosOferta(Contenedor):
     def __init__(self, path_fo, path_rm):
         super().__init__()
-        self.fo_db: FODB = FODB(path_fo)
-        self.rm_db: RMDB = RMDB(path_rm)
+        self.fo_db: OfertaDB = OfertaDB(path_fo)
+        self.rm_db: OfertaDB = OfertaDB(path_rm)
         list_fo: list[Oferta] = [FO(*args) for args in self.fo_db.args]
         list_rm: list[Oferta] = [RM(*args) for args in self.rm_db.args]
         self.nodos: list[Oferta] = list_fo + list_rm

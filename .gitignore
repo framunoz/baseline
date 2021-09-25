@@ -130,3 +130,6 @@ dmypy.json
 
 # JetBrains
 .idea/
+
+# No salvar la data
+data/
