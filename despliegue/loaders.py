@@ -6,10 +6,10 @@ import pandas as pd
 
 
 class DataBase(ABC):
-    def __init__(self, path, col_names=None):
-        self.path: bytes = os.path.join(path)
+    def __init__(self, path: bytes = None, df: pd.DataFrame = None, col_names: list[str] = None):
+        self.path: bytes = os.path.join(path) if path is not None else None
         self.col_names: list[str] = col_names
-        self.df: pd.DataFrame = pd.DataFrame()
+        self.df: pd.DataFrame = df
 
     def __len__(self) -> int:
         return len(self.df)
@@ -18,10 +18,13 @@ class DataBase(ABC):
     def args(self):
         return self.df.values
 
+    def __repr__(self):
+        return self.df.__repr__()
+
 
 class OfertaDB(DataBase):
 
-    def __init__(self, path, col_names=None):
+    def __init__(self, path: bytes = None, df: pd.DataFrame = None, col_names: list[str] = None):
         """
         Constructor.
 
@@ -30,16 +33,16 @@ class OfertaDB(DataBase):
             ["id", "latitud", "longitud", "vacancia"]. Si no se entrega se asume que el dataset contiene únicamente
             estas columnas en el mismo orden.
         """
-        super().__init__(path, col_names)
-        if col_names is not None:
-            self.df: pd.DataFrame = pd.read_excel(self.path, dtype=object)[self.col_names]
-        else:
+        super().__init__(path, df, col_names)
+        if self.path is not None:
             self.df: pd.DataFrame = pd.read_excel(self.path, dtype=object)
+        if self.col_names is not None:
+            self.df: pd.DataFrame = self.df[self.col_names]
         self.df.columns = ["id", "lat", "lon", "vac"]
 
 
 class ClienteDB(DataBase):
-    def __init__(self, path, col_names=None):
+    def __init__(self, path: bytes = None, df: pd.DataFrame = None, col_names: list[str] = None):
         """
         Constructor.
 
@@ -47,11 +50,11 @@ class ClienteDB(DataBase):
         :param col_names: Una lista con los nombres de las columnas en el orden ["id", "latitud", "longitud"].
             Si no se entrega se asume que el dataset contiene únicamente estas columnas en el mismo orden.
         """
-        super().__init__(path, col_names)
-        if col_names is not None:
-            self.df: pd.DataFrame = pd.read_excel(self.path, dtype=object)[self.col_names]
-        else:
+        super().__init__(path, df, col_names)
+        if self.path is not None:
             self.df: pd.DataFrame = pd.read_excel(self.path, dtype=object)
+        if col_names is not None:
+            self.df: pd.DataFrame = self.df[self.col_names]
         self.df.columns = ["id", "lat", "lon"]
 
 

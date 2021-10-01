@@ -21,10 +21,22 @@ class Nodo(ABC):
 
     @abc.abstractmethod
     def dist_1(self, other) -> float:
+        """
+        Representa la distancia entre las calles. Se aproxima con la 1-distancia.
+
+        :param other: Otro Nodo
+        :return: la distancia entre el nodo actual y el siguiente nodo
+        """
         pass
 
     @abc.abstractmethod
     def dist_2(self, other) -> float:
+        """
+        Representa la distancia de la esfera. Corresponde a la 2-distancia.
+
+        :param other: Otro Nodo
+        :return: la distancia entre el nodo actual y el siguiente nodo
+        """
         pass
 
 
@@ -33,11 +45,11 @@ class Cliente(Nodo):
     Cliente
     """
 
-    def dist_1(self, other) -> float:
-        pass
+    def dist_1(self, other: Nodo) -> float:
+        return other.dist_1(self)  # Double Dispatch
 
-    def dist_2(self, other) -> float:
-        pass
+    def dist_2(self, other: Nodo) -> float:
+        return other.dist_2(self)  # Double Dispatch
 
 
 class Oferta(Nodo, ABC):
@@ -56,10 +68,10 @@ class FO(Oferta):
     Fibra Óptica
     """
 
-    def dist_1(self, other) -> float:
+    def dist_1(self, other: Nodo) -> float:
         pass
 
-    def dist_2(self, other) -> float:
+    def dist_2(self, other: Nodo) -> float:
         pass
 
 
@@ -68,10 +80,10 @@ class RM(Oferta):
     Red Móvil
     """
 
-    def dist_1(self, other) -> float:
+    def dist_1(self, other: Nodo) -> float:
         pass
 
-    def dist_2(self, other) -> float:
+    def dist_2(self, other: Nodo) -> float:
         pass
 
 
@@ -83,8 +95,8 @@ class Sumidero(Oferta):
     def __init__(self):
         super().__init__(0, 0., 0., 0)
 
-    def dist_1(self, other) -> float:
+    def dist_1(self, other: Nodo) -> float:
         pass
 
-    def dist_2(self, other) -> float:
+    def dist_2(self, other: Nodo) -> float:
         pass
