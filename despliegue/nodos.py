@@ -14,11 +14,13 @@ class Nodo(ABC):
     Representa un nodo. Puede ser una Fibra Óptica (FO), Red Móvil (RM), Clientes o Sumidero
     """
 
-    def __init__(self, identificador, lat, lon):
-        self.id = identificador
+    def __init__(self, i, id, lat, lon):
+        self.i = i
+        self.id = id
         self.lat, self.lon = lat, lon
         k = math.tau / 360
         self.lat_rad, self.lon_rad = lat * k, lon * k
+        self.vecinos = set()
 
     def __repr__(self):
         return (self.__class__.__name__ + "("
@@ -51,6 +53,10 @@ class Nodo(ABC):
         """
         pass
 
+    def agregar_vecino(self, other):
+        self.vecinos |= {other.i}
+        other.vecinos |= {self.i}
+
 
 class Cliente(Nodo):
     """
@@ -73,8 +79,8 @@ class Cliente(Nodo):
 
 
 class Oferta(Nodo, ABC):
-    def __init__(self, identificador, lat, lon, vacancia):
-        Nodo.__init__(self, identificador, lat, lon)
+    def __init__(self, i, id, lat, lon, vacancia):
+        Nodo.__init__(self, i, id, lat, lon)
         self.vacancia = vacancia
 
     def __repr__(self):
@@ -111,7 +117,7 @@ class Sumidero(Oferta):
     """
 
     def __init__(self):
-        super().__init__(0, 0., 0., 0)
+        super().__init__(0, "", 0., 0., 0)
 
     def dist_1(self, other: Nodo) -> float:
         return 0.

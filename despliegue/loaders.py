@@ -16,7 +16,7 @@ class DataBase(ABC):
 
     @property
     def args(self):
-        return self.df.values
+        return ((i, *arg) for i, arg in zip(range(len(self)), self.df.values))
 
     def __repr__(self):
         return self.df.__repr__()
