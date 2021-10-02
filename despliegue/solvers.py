@@ -40,20 +40,24 @@ class AbstractSolver(abc.ABC):
         self.x = None
 
     @abc.abstractmethod
-    def definir_funcion_objetivo(self):
+    def _definir_funcion_objetivo(self):
         pass
 
     @abc.abstractmethod
-    def definir_restricciones(self):
+    def _definir_restricciones(self):
         pass
 
-    def construir_modelo(self):
+    def _construir_modelo(self):
         if self.verbose:
             print("Construyendo modelo...")
-        self.definir_funcion_objetivo()
-        self.definir_restricciones()
+            print("Definiendo función objetivo...")
+        self._definir_funcion_objetivo()
+        if self.verbose:
+            print("Definiendo restricciones...")
+        self._definir_restricciones()
 
     def resolver(self):
+        self._construir_modelo()
         if self.verbose:
             print("Empezando a resolver...")
         self.modelo.solve()
@@ -81,7 +85,6 @@ class AbstractSolver(abc.ABC):
                     df.at[j, "cate_oferta"] = self.oferta[i].cate
                     df.at[j, "oferta_id"] = self.oferta[i].id
 
-        #
         if path is None:
             path = "./"
 
@@ -95,7 +98,8 @@ class Solver1(AbstractSolver):
     Solver que utiliza muchas variables. Aunque sea factible, toma mucho tiempo.
     """
 
-    def __init__(self, oferta: NodosOferta, demanda: NodosDemanda, a=1, b=1, c_fo=150, c_rm=600, verbose=False):
+    def __init__(self, oferta: NodosOferta, demanda: NodosDemanda,
+                 a=2, b=1, c_fo=150, c_rm=600, verbose=False):
         super().__init__(oferta, demanda, c_fo, c_rm, verbose)
 
         # Constantes
@@ -110,19 +114,19 @@ class Solver1(AbstractSolver):
 
         # Definición del modelo
         self.x: pulp.LpVariable.dicts = pulp.LpVariable.dicts(
-            "x",
-            ((i, j) for i in self.oferta.indice for j in self.demanda.indice),
+            name="x",
+            indexs=((i, j) for i in self.oferta.indice for j in self.demanda.indice),
             cat="Binary"
         )
 
-    def definir_funcion_objetivo(self):
+    def _definir_funcion_objetivo(self):
         self.modelo += pulp.lpSum([
             pulp.lpSum([
                 self.matriz_costos[i, j] * self.x[i, j] for j in self.demanda.indice
             ]) for i in self.oferta.indice
         ])
 
-    def definir_restricciones(self):
+    def _definir_restricciones(self):
         # Restricción de la Oferta
         for i in self.oferta.indice:
             self.modelo += pulp.lpSum([self.x[i, j] for j in self.demanda.indice]) <= self.oferta[i].vacancia
@@ -144,39 +148,30 @@ class Solver1(AbstractSolver):
                 self.modelo += self.x[i, j] * o_i.dist_2(d_j) <= self.c_rm
 
 
-class Solver2(AbstractSolver):
+class Solver2(Solver1):
     """
     Solver que utiliza muchas variables. Aunque sea factible, toma mucho tiempo.
     """
 
-    def __init__(self, oferta: NodosOferta, demanda: NodosDemanda, a=1, b=1, c_fo=150, c_rm=600, verbose=False):
-        super().__init__(oferta, demanda, c_fo, c_rm, verbose)
-
-        # Constantes
-        self.a = a
-        self.b = b
-
-        # Matriz de Costos
-        for i in self.oferta.indice_fo:
-            self.matriz_costos[i] = self.a
-        for i in self.oferta.indice_rm:
-            self.matriz_costos[i] = self.b
+    def __init__(self, oferta: NodosOferta, demanda: NodosDemanda,
+                 a=2, b=1, c_fo=150, c_rm=600, verbose=False):
+        super().__init__(oferta, demanda, a, b, c_fo, c_rm, verbose)
 
         # Definición del modelo
         self.x: pulp.LpVariable.dicts = pulp.LpVariable.dicts(
-            "x",
-            ((i, j) for i in self.oferta.indice for j in self.oferta[i].vecinos),
+            name="x",
+            indexs=((i, j) for i in self.oferta.indice for j in self.oferta[i].vecinos),
             cat="Binary"
         )
 
-    def definir_funcion_objetivo(self):
+    def _definir_funcion_objetivo(self):
         self.modelo += pulp.lpSum([
             pulp.lpSum([
                 self.matriz_costos[i, j] * self.x[i, j] for j in self.oferta[i].vecinos
             ]) for i in self.oferta.indice
         ])
 
-    def definir_restricciones(self):
+    def _definir_restricciones(self):
         # Restricción de la Oferta
         for i in self.oferta.indice:
             self.modelo += pulp.lpSum([self.x[i, j] for j in self.oferta[i].vecinos]) <= self.oferta[i].vacancia
@@ -187,7 +182,8 @@ class Solver2(AbstractSolver):
 
 
 class Solver3(Solver2):
-    def __init__(self, oferta: NodosOferta, demanda: NodosDemanda, a=1000, b=100, c_fo=150, c_rm=600, eps=1e-8,
+    def __init__(self, oferta: NodosOferta, demanda: NodosDemanda,
+                 a=2, b=1, c_fo=150, c_rm=600, eps=1e-8,
                  verbose=False):
         super().__init__(oferta, demanda, a, b, c_fo, c_rm, verbose)
         # Matriz de Costos

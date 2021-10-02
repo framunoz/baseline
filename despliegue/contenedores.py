@@ -29,18 +29,22 @@ class Contenedor(ABC):
 class NodosOferta(Contenedor):
     def __init__(self, fo_db: OfertaDB, rm_db: OfertaDB):
         super().__init__()
+        # Agregar los loaders
         self.fo_db: OfertaDB = fo_db
         self.rm_db: OfertaDB = rm_db
+        # Crear listas de nodos
         list_fo: list[Oferta] = [FO(*args) for args in self.fo_db.args]
         list_rm: list[Oferta] = [RM(*args) for args in self.rm_db.args]
         self.nodos: list[Oferta] = list_fo + list_rm + [Sumidero()]
+        # Crear conjuntos de índices
         len_fo = len(list_fo)
         range_oferta = list(range(len(self)))
         self.indice = set(range_oferta)
-        for i in self.indice:
-            self.nodos[i].i = i
         self.indice_fo = set(range_oferta[:len_fo])
         self.indice_rm = set(range_oferta[len_fo:-1])
+        # Actualizar los índices de los nodos
+        for i in self.indice:
+            self.nodos[i].i = i
 
     def __getitem__(self, item) -> Oferta:
         return self.nodos.__getitem__(item)

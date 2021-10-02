@@ -15,6 +15,7 @@ setup(
     version="0.1.0",
     description="Libreria para la baseline de despliegue",
     author="F. Muñoz",
+    author_email="fmunoz@ug.uchile.cl",
     license="MIT",
     install_requires=install_requires,
 )

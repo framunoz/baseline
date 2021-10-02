@@ -23,16 +23,16 @@ class DataBase(ABC):
 
 
 class OfertaDB(DataBase):
-
-    def __init__(self, path: bytes = None, df: pd.DataFrame = None, col_names: list[str] = None):
-        """
-        Constructor.
+    """
+        Constructor. Prioriza el Path antes del df.
 
         :param path: El path del archivo .xlsx
         :param col_names: Una lista con los nombres de las columnas en el orden
             ["id", "latitud", "longitud", "vacancia"]. Si no se entrega se asume que el dataset contiene únicamente
             estas columnas en el mismo orden.
         """
+
+    def __init__(self, path: bytes = None, df: pd.DataFrame = None, col_names: list[str] = None):
         super().__init__(path, df, col_names)
         if self.path is not None:
             self.df: pd.DataFrame = pd.read_excel(self.path, dtype=object)
@@ -44,7 +44,7 @@ class OfertaDB(DataBase):
 class ClienteDB(DataBase):
     def __init__(self, path: bytes = None, df: pd.DataFrame = None, col_names: list[str] = None):
         """
-        Constructor.
+        Constructor. Prioriza el Path antes del df.
 
         :param path: El path del archivo .xlsx
         :param col_names: Una lista con los nombres de las columnas en el orden ["id", "latitud", "longitud"].
