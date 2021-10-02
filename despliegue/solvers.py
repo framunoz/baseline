@@ -5,6 +5,8 @@ from despliegue.contenedores import NodosOferta, NodosDemanda
 
 
 class Solver:
+    verbose = False
+
     def __init__(self, oferta: NodosOferta, demanda: NodosDemanda, a=1, b=1, c_fo=150, c_rm=600):
 
         # Nodos oferta y demanda
@@ -29,7 +31,7 @@ class Solver:
         self.modelo = pulp.LpProblem("despliegue", pulp.LpMaximize)
         self.x = pulp.LpVariable.dicts(
             "x",
-            (ind for ind in zip(self.oferta.indice, self.demanda.indice)),
+            ((i, j) for i in self.oferta.indice for j in self.demanda.indice),
             cat="Binary"
         )
 
@@ -62,12 +64,16 @@ class Solver:
                 self.modelo += self.x[i, j] * o_i.dist_2(d_j) <= self.c_rm
 
     def construir_modelo(self):
+        if self.verbose:
+            print("Construyendo modelo...")
         self.definir_funcion_objetivo()
         self.definir_restricciones()
 
-    def resolver(self, verbose=False):
+    def resolver(self):
+        if self.verbose:
+            print("Empezando a resolver...")
         self.modelo.solve()
-        if verbose:
+        if self.verbose:
             print("Estado: " + pulp.LpStatus[self.modelo.status])
 
     @property
