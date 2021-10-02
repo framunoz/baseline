@@ -37,6 +37,8 @@ class NodosOferta(Contenedor):
         len_fo = len(list_fo)
         range_oferta = list(range(len(self)))
         self.indice = set(range_oferta)
+        for i in self.indice:
+            self.nodos[i].i = i
         self.indice_fo = set(range_oferta[:len_fo])
         self.indice_rm = set(range_oferta[len_fo:-1])
 

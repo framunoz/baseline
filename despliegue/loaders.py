@@ -78,7 +78,6 @@ class MatrizDistanciaCTO(metaclass=SingletonMeta):
     """
 
     def __init__(self, n=None, m=None):
-
         if n is not None and m is not None:
             self.matriz: np.ndarray = np.zeros((n, m))
         else:

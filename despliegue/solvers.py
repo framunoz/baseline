@@ -7,13 +7,29 @@ from despliegue.contenedores import NodosOferta, NodosDemanda
 
 
 class AbstractSolver(abc.ABC):
-    def __init__(self, oferta: NodosOferta, demanda: NodosDemanda, verbose: bool):
+    def __init__(self, oferta: NodosOferta, demanda: NodosDemanda, c_fo, c_rm, verbose: bool):
+        # Constantes
         self.verbose = verbose
+        self.c_fo = c_fo
+        self.c_rm = c_rm
 
         # Nodos oferta y demanda
         self.oferta = oferta
         self.demanda = demanda
         self.oferta[-1].vacancia = len(demanda)  # Seteamos la vacancia del sumidero
+
+        # Agregar vecinos
+        for j in self.demanda.indice:
+            d_j = self.demanda[j]
+            for i in self.oferta.indice_fo:
+                o_i = self.oferta[i]
+                if o_i.dist_1(d_j) <= c_fo:
+                    o_i.agregar_vecino(d_j)
+            for i in self.oferta.indice_rm:
+                o_i = self.oferta[i]
+                if o_i.dist_1(d_j) <= c_rm:
+                    o_i.agregar_vecino(d_j)
+            d_j.agregar_vecino(self.oferta[-1])
 
         # Matriz de Costos
         self.matriz_costos = np.zeros((len(self.oferta), len(self.demanda)))
@@ -54,13 +70,11 @@ class Solver1(AbstractSolver):
     """
 
     def __init__(self, oferta: NodosOferta, demanda: NodosDemanda, a=1, b=1, c_fo=150, c_rm=600, verbose=False):
-        super().__init__(oferta, demanda, verbose)
+        super().__init__(oferta, demanda, c_fo, c_rm, verbose)
 
         # Constantes
         self.a = a
         self.b = b
-        self.c_fo = c_fo
-        self.c_rm = c_rm
 
         # Matriz de Costos
         for i in self.oferta.indice_fo:
@@ -110,13 +124,11 @@ class Solver2(AbstractSolver):
     """
 
     def __init__(self, oferta: NodosOferta, demanda: NodosDemanda, a=1, b=1, c_fo=150, c_rm=600, verbose=False):
-        super().__init__(oferta, demanda, verbose)
+        super().__init__(oferta, demanda, c_fo, c_rm, verbose)
 
         # Constantes
         self.a = a
         self.b = b
-        self.c_fo = c_fo
-        self.c_rm = c_rm
 
         # Matriz de Costos
         for i in self.oferta.indice_fo:
@@ -127,34 +139,39 @@ class Solver2(AbstractSolver):
         # Definición del modelo
         self.x: pulp.LpVariable.dicts = pulp.LpVariable.dicts(
             "x",
-            ((i, j) for i in self.oferta.indice for j in self.demanda.indice),
+            ((i, j) for i in self.oferta.indice for j in self.oferta[i].vecinos),
             cat="Binary"
         )
 
     def definir_funcion_objetivo(self):
         self.modelo += pulp.lpSum([
             pulp.lpSum([
-                self.matriz_costos[i, j] * self.x[i, j] for j in self.demanda.indice
+                self.matriz_costos[i, j] * self.x[i, j] for j in self.oferta[i].vecinos
             ]) for i in self.oferta.indice
         ])
 
     def definir_restricciones(self):
         # Restricción de la Oferta
         for i in self.oferta.indice:
-            self.modelo += pulp.lpSum([self.x[i, j] for j in self.demanda.indice]) <= self.oferta[i].vacancia
+            self.modelo += pulp.lpSum([self.x[i, j] for j in self.oferta[i].vecinos]) <= self.oferta[i].vacancia
 
         # Restricción de la Demanda
         for j in self.demanda.indice:
-            self.modelo += pulp.lpSum([self.x[i, j] for i in self.oferta.indice]) == 1
+            self.modelo += pulp.lpSum([self.x[i, j] for i in self.demanda[j].vecinos]) == 1
 
-        # Restricción de la distancia en FO
+
+class Solver3(Solver2):
+    def __init__(self, oferta: NodosOferta, demanda: NodosDemanda, a=1000, b=100, c_fo=150, c_rm=600, eps=1e-8,
+                 verbose=False):
+        super().__init__(oferta, demanda, a, b, c_fo, c_rm, verbose)
+        # Matriz de Costos
         for i in self.oferta.indice_fo:
-            for j in self.demanda.indice:
+            for j in self.oferta[i].vecinos:
                 o_i, d_j = self.oferta[i], self.demanda[j]
-                self.modelo += self.x[i, j] * o_i.dist_1(d_j) <= self.c_fo
-
-        # Restricción de la distancia en RM
+                dist = o_i.dist_1(d_j)
+                self.matriz_costos[i, j] = self.a / (dist + eps)
         for i in self.oferta.indice_rm:
-            for j in self.demanda.indice:
+            for j in self.oferta[i].vecinos:
                 o_i, d_j = self.oferta[i], self.demanda[j]
-                self.modelo += self.x[i, j] * o_i.dist_2(d_j) <= self.c_rm
+                dist = o_i.dist_1(d_j)
+                self.matriz_costos[i, j] = self.b / (dist + eps)
