@@ -1,5 +1,12 @@
 import abc
+import math
 from abc import ABC
+
+R = 6.3781e6  # Radio de la Tierra
+
+
+def _dist_p(dx, dy, p=2):
+    return (abs(dx) ** p + abs(dy) ** p) ** (1 / p)
 
 
 class Nodo(ABC):
@@ -9,8 +16,9 @@ class Nodo(ABC):
 
     def __init__(self, identificador, lat, lon):
         self.id = identificador
-        self.lat = lat
-        self.lon = lon
+        self.lat, self.lon = lat, lon
+        k = math.tau / 360
+        self.lat_rad, self.lon_rad = lat * k, lon * k
 
     def __repr__(self):
         return (self.__class__.__name__ + "("
@@ -18,6 +26,10 @@ class Nodo(ABC):
                 + "lat=" + str(self.lat) + ", "
                 + "lon=" + str(self.lon)
                 + ")")
+
+    @abc.abstractmethod
+    def __sub__(self, other) -> (float, float):
+        pass
 
     @abc.abstractmethod
     def dist_1(self, other) -> float:
@@ -45,10 +57,18 @@ class Cliente(Nodo):
     Cliente
     """
 
+    def __sub__(self, other: Nodo) -> (float, float):
+        d_lat, d_lon = self.lat_rad - other.lat_rad, self.lon_rad - other.lon_rad
+        return d_lat * R, d_lon * R
+
     def dist_1(self, other: Nodo) -> float:
+        if isinstance(other, Cliente):
+            return _dist_p(*(self - other), p=1)
         return other.dist_1(self)  # Double Dispatch
 
     def dist_2(self, other: Nodo) -> float:
+        if isinstance(other, Cliente):
+            return _dist_p(*(self - other), p=2)
         return other.dist_2(self)  # Double Dispatch
 
 
@@ -62,29 +82,27 @@ class Oferta(Nodo, ABC):
                 + "vacancia=" + str(self.vacancia)
                 + ")")
 
+    def __sub__(self, other: Nodo) -> (float, float):
+        d_lat, d_lon = self.lat_rad - other.lat_rad, self.lon_rad - other.lon_rad
+        return d_lat * R, d_lon * R
+
+    def dist_1(self, other: Nodo) -> float:
+        return _dist_p(*(self - other), p=1)
+
+    def dist_2(self, other: Nodo) -> float:
+        return _dist_p(*(self - other), p=2)
+
 
 class FO(Oferta):
     """
     Fibra Óptica
     """
 
-    def dist_1(self, other: Nodo) -> float:
-        pass
-
-    def dist_2(self, other: Nodo) -> float:
-        pass
-
 
 class RM(Oferta):
     """
     Red Móvil
     """
-
-    def dist_1(self, other: Nodo) -> float:
-        pass
-
-    def dist_2(self, other: Nodo) -> float:
-        pass
 
 
 class Sumidero(Oferta):
@@ -96,7 +114,7 @@ class Sumidero(Oferta):
         super().__init__(0, 0., 0., 0)
 
     def dist_1(self, other: Nodo) -> float:
-        pass
+        return 0.
 
     def dist_2(self, other: Nodo) -> float:
-        pass
+        return 0.
