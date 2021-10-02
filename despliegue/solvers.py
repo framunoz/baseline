@@ -1,6 +1,7 @@
 import abc
 
 import numpy as np
+import pandas as pd
 import pulp
 
 from despliegue.contenedores import NodosOferta, NodosDemanda
@@ -62,6 +63,31 @@ class AbstractSolver(abc.ABC):
     @property
     def variables(self):
         return self.modelo.variables()
+
+    def save(self, path=None):
+        if self.verbose:
+            print("Salvando resultados...")
+        columns = ["cl_id", "cl_lat", "cl_lon", "cate_oferta", "oferta_id"]
+
+        df = pd.DataFrame(columns=columns)
+
+        for j in self.demanda.indice:
+            for i in self.demanda[j].vecinos:
+                var = self.x[i, j]
+                if var.varValue != 0:
+                    df.at[j, "cl_id"] = int(self.demanda[j].id)
+                    df.at[j, "cl_lat"] = self.demanda[j].lat
+                    df.at[j, "cl_lon"] = self.demanda[j].lon
+                    df.at[j, "cate_oferta"] = self.oferta[i].cate
+                    df.at[j, "oferta_id"] = self.oferta[i].id
+
+        #
+        if path is None:
+            path = "./"
+
+        df.to_excel(path, index=False)
+        if self.verbose:
+            print("Resultados Salvados!")
 
 
 class Solver1(AbstractSolver):

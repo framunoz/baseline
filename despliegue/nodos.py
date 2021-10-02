@@ -79,9 +79,10 @@ class Cliente(Nodo):
 
 
 class Oferta(Nodo, ABC):
-    def __init__(self, i, id, lat, lon, vacancia):
+    def __init__(self, i, id, lat, lon, vacancia, cate):
         Nodo.__init__(self, i, id, lat, lon)
         self.vacancia = vacancia
+        self.cate = cate
 
     def __repr__(self):
         return (super().__repr__()[:-1] + ", "
@@ -104,11 +105,17 @@ class FO(Oferta):
     Fibra Óptica
     """
 
+    def __init__(self, i, id, lat, lon, vacancia):
+        super().__init__(i, id, lat, lon, vacancia, "FO")
+
 
 class RM(Oferta):
     """
     Red Móvil
     """
+
+    def __init__(self, i, id, lat, lon, vacancia):
+        super().__init__(i, id, lat, lon, vacancia, "RM")
 
 
 class Sumidero(Oferta):
@@ -117,7 +124,7 @@ class Sumidero(Oferta):
     """
 
     def __init__(self):
-        super().__init__(0, "", 0., 0., 0)
+        super().__init__(0, "", 0., 0., 0, "Sumidero")
 
     def dist_1(self, other: Nodo) -> float:
         return 0.
