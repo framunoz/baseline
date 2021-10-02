@@ -1,6 +1,8 @@
 import abc
 from abc import ABC
 
+import numpy as np
+
 from despliegue.loaders import OfertaDB, ClienteDB
 from despliegue.nodos import FO, RM, Oferta, Cliente, Sumidero
 
@@ -18,12 +20,15 @@ class Contenedor(ABC):
     def __getitem__(self, item):
         pass
 
+    def __repr__(self):
+        return self.__class__.__name__ + "([\n  " + str(np.array(self.nodos))[1:-1].replace("\n", "\n ") + "\n])"
+
 
 class NodosOferta(Contenedor):
-    def __init__(self, path_fo, path_rm):
+    def __init__(self, fo_db: OfertaDB, rm_db: OfertaDB):
         super().__init__()
-        self.fo_db: OfertaDB = OfertaDB(path_fo)
-        self.rm_db: OfertaDB = OfertaDB(path_rm)
+        self.fo_db: OfertaDB = fo_db
+        self.rm_db: OfertaDB = rm_db
         list_fo: list[Oferta] = [FO(*args) for args in self.fo_db.args]
         list_rm: list[Oferta] = [RM(*args) for args in self.rm_db.args]
         self.nodos: list[Oferta] = list_fo + list_rm + [Sumidero()]
@@ -39,9 +44,9 @@ class NodosOferta(Contenedor):
 
 
 class NodosDemanda(Contenedor):
-    def __init__(self, path):
+    def __init__(self, db: ClienteDB):
         super().__init__()
-        self.db: ClienteDB = ClienteDB(path)
+        self.db: ClienteDB = db
         self.nodos: list[Cliente] = [Cliente(*args) for args in self.db.args]
         self.total = len(self)
         self.indice = set(range(len(self)))
